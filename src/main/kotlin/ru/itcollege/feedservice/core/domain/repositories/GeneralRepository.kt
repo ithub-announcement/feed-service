@@ -25,6 +25,7 @@ interface GeneralRepository : JpaRepository<General, UUID> {
    * Получение записи по **status** и **uuid**.
    *
    * @param status
+   * @param uuid
    * */
 
   fun findByStatusAndUuid(status: GStatus, uuid: UUID): General
