@@ -28,5 +28,16 @@ interface GeneralRepository : JpaRepository<General, UUID> {
    * @param uuid
    * */
 
-  fun findByStatusAndUuid(status: GStatus, uuid: UUID): General
+  fun findByStatusAndUuid(status: GStatus, uuid: UUID): General?
+
+  /**
+   * ### findByStatusAndAuthorId
+   *
+   * Получить список по **status** и **authorId**.
+   *
+   * @param status
+   * @param authorId
+   * */
+
+  fun findByStatusAndAuthorId(status: GStatus, authorId: String): MutableList<General>
 }
