@@ -1,5 +1,6 @@
 package ru.itcollege.feedservice.core.domain.models.entities
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -29,6 +30,7 @@ class General {
   @Column(unique = false, nullable = false, updatable = true)
   lateinit var date: ZonedDateTime
 
+  @JsonIgnore
   @Column(unique = false, nullable = false, updatable = true)
   lateinit var status: GStatus
 }
