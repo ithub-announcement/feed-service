@@ -22,7 +22,11 @@ class DraftsController(private var draftsService: DraftsService) {
   }
 
   @PostMapping("/save")
-  fun saveDraft(@RequestParam(required = false) uuid: String?, @RequestBody body: DraftPayload, request: HttpServletRequest): General? {
+  fun saveDraft(
+    @RequestParam(required = false) uuid: String?,
+    @RequestBody body: DraftPayload,
+    request: HttpServletRequest
+  ): General? {
     return this.draftsService.save(uuid, body, request)
   }
 

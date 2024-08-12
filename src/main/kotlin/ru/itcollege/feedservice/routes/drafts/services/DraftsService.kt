@@ -15,7 +15,11 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @Service
-class DraftsService(private var generalRepository: GeneralRepository, private var mapper: MapperConfig, private var authorizationGrpcClient: AuthorizationGrpcClient) {
+class DraftsService(
+  private var generalRepository: GeneralRepository,
+  private var mapper: MapperConfig,
+  private var authorizationGrpcClient: AuthorizationGrpcClient
+) {
 
   /**
    * ## findAllByAuthorId
