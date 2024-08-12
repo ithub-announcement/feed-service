@@ -54,7 +54,7 @@ class TagsService(private var tagsRepository: TagsRepository, private var mapper
    * */
 
   fun delete(id: Long) {
-    return this.tagsRepository.deleteById(id)
+    this.tagsRepository.deleteById(id)
   }
 
   /**
