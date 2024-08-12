@@ -1,6 +1,9 @@
 package ru.itcollege.feedservice.routes.drafts.services
 
+
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.stereotype.Service
+import ru.itcollege.feedservice.core.api.authorization.AuthorizationGrpcClient
 import ru.itcollege.feedservice.core.config.MapperConfig
 import ru.itcollege.feedservice.core.domain.handlers.ResourceNotFoundException
 import ru.itcollege.feedservice.core.domain.models.entities.General
@@ -12,7 +15,7 @@ import java.time.ZonedDateTime
 import java.util.*
 
 @Service
-class DraftsService(private var generalRepository: GeneralRepository, private var mapper: MapperConfig) {
+class DraftsService(private var generalRepository: GeneralRepository, private var mapper: MapperConfig, private var authorizationGrpcClient: AuthorizationGrpcClient) {
 
   /**
    * ## findAllByAuthorId
@@ -20,12 +23,8 @@ class DraftsService(private var generalRepository: GeneralRepository, private va
    * Получить список черновиков по **authorId**
    * */
 
-  fun findAllByAuthorId(): MutableList<General> {
-    /**
-     * ! В данном моменте стоит заглущка в виде моего id.
-     * TODO: Сделать получение пользователя по токену с сервера авторизации.
-     * */
-    val authorId = "i22s0646"
+  fun findAllByAuthorId(request: HttpServletRequest): MutableList<General> {
+    val authorId: String = this.authorizationGrpcClient.getUserByAccess(request.getHeader("Authorization")).toString()
     return this.generalRepository.findByStatusAndAuthorId(GStatus.DRAFT, authorId)
   }
 
@@ -87,12 +86,8 @@ class DraftsService(private var generalRepository: GeneralRepository, private va
    * @param payload
    * */
 
-  fun save(uuid: String?, payload: DraftPayload): General? {
-    /**
-     * ! В данном моменте стоит заглущка в виде моего id.
-     * TODO: Сделать получение пользователя по токену с сервера авторизации.
-     * */
-    val authorId = "i22s0646"
+  fun save(uuid: String?, payload: DraftPayload, request: HttpServletRequest): General? {
+    val authorId: String = this.authorizationGrpcClient.getUserByAccess(request.getHeader("Authorization")).toString()
     return uuid?.let { this.update(it, payload) } ?: this.create(authorId, payload)
   }
 
