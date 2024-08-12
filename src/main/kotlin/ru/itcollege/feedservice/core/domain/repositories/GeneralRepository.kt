@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 import ru.itcollege.feedservice.core.domain.models.entities.General
 import ru.itcollege.feedservice.core.domain.models.enums.GStatus
-import java.util.UUID
+import java.util.*
 
 @Repository
 interface GeneralRepository : JpaRepository<General, UUID> {

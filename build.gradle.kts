@@ -1,9 +1,25 @@
 plugins {
   id("org.springframework.boot") version "3.3.1"
   id("io.spring.dependency-management") version "1.1.5"
+
+  id("io.github.lognet.grpc-spring-boot") version "5.1.5"
+
   kotlin("jvm") version "1.9.24"
   kotlin("plugin.spring") version "1.9.24"
 }
+
+buildscript {
+  repositories {
+    maven {
+      url = uri("https://plugins.gradle.org/m2/")
+    }
+  }
+  dependencies {
+    classpath("io.github.lognet:grpc-spring-boot-starter-gradle-plugin:5.1.5")
+  }
+}
+
+apply(plugin = "io.github.lognet.grpc-spring-boot")
 
 group = "ru.itcollege"
 version = "0.0.1-SNAPSHOT"
