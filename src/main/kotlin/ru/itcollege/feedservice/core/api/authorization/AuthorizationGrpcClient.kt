@@ -2,9 +2,9 @@ package ru.itcollege.feedservice.core.api.authorization
 
 import io.grpc.ManagedChannelBuilder
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Service
 import ru.itcollege.grpc.authorization.AuthorizationServiceGrpc
 import ru.itcollege.grpc.authorization.JWTPayload
-import ru.itcollege.grpc.authorization.User
 
 /**
  * # AuthorizationGrpcClient
@@ -14,15 +14,13 @@ import ru.itcollege.grpc.authorization.User
  * @author Чехонадских Дмитрий <loseex@vk.com>
  * */
 
+@Service
 class AuthorizationGrpcClient {
   @Value("\${api.authorization.url}")
   private lateinit var host: String
 
   @Value("\${api.authorization.port}")
   private var port: Int = 0
-
-  private var channel = ManagedChannelBuilder.forAddress(this.host, this.port).usePlaintext().build()
-  private var stub = AuthorizationServiceGrpc.newBlockingStub(channel)
 
   /**
    * ## getUserByAccess
@@ -32,8 +30,11 @@ class AuthorizationGrpcClient {
    * @param token
    * */
 
-  fun getUserByAccess(token: String): User? {
+  fun getUserByAccess(token: String): String? {
+    val channel = ManagedChannelBuilder.forAddress(this.host, this.port).usePlaintext().build()
+    val stub = AuthorizationServiceGrpc.newBlockingStub(channel)
+
     val payload = JWTPayload.newBuilder().setAccess(token).build()
-    return this.stub.getUserByAccess(payload)
+    return stub.getUserByAccess(payload).uid
   }
 }
