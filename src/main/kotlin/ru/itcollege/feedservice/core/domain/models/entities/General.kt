@@ -8,7 +8,7 @@ import jakarta.persistence.Id
 import org.hibernate.annotations.UuidGenerator
 import ru.itcollege.feedservice.core.domain.models.enums.GStatus
 import java.time.ZonedDateTime
-import java.util.UUID
+import java.util.*
 
 @Entity(name = "general")
 class General {
