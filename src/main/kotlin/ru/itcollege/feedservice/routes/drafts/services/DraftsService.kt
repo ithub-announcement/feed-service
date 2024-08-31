@@ -1,6 +1,5 @@
 package ru.itcollege.feedservice.routes.drafts.services
 
-
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.stereotype.Service
 import ru.itcollege.feedservice.core.api.authorization.AuthorizationGrpcClient
