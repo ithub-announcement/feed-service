@@ -1,5 +1,6 @@
 package ru.itcollege.feedservice.routes.announcements.services
 
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import ru.itcollege.feedservice.core.domain.models.entities.General
 import ru.itcollege.feedservice.core.domain.models.enums.GStatus
@@ -16,8 +17,9 @@ class AnnouncementsService(private var generalRepository: GeneralRepository) {
    *
    * */
 
-  fun findAll(): MutableList<General> {
-    return this.generalRepository.findAllByStatus(GStatus.PUBLIC)
+  fun findAll(): ResponseEntity<MutableList<General>> {
+    val array = this.generalRepository.findAllByStatus(GStatus.PUBLIC)
+    return ResponseEntity.ok().body(array)
   }
 
   /**
@@ -28,8 +30,9 @@ class AnnouncementsService(private var generalRepository: GeneralRepository) {
    * @param uuid
    * */
 
-  fun findOneByUUID(uuid: String): General? {
-    return this.generalRepository.findByStatusAndUuid(GStatus.PUBLIC, UUID.fromString(uuid))
+  fun findOneByUUID(uuid: String): ResponseEntity<General> {
+    val current = this.generalRepository.findByStatusAndUuid(GStatus.PUBLIC, UUID.fromString(uuid))
+    return ResponseEntity.ok().body(current)
   }
 
 }

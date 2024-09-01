@@ -1,5 +1,6 @@
 package ru.itcollege.feedservice.routes.tags.services
 
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import ru.itcollege.feedservice.core.config.MapperConfig
 import ru.itcollege.feedservice.routes.tags.models.dto.TagPayload
@@ -17,8 +18,9 @@ class TagsService(private var tagsRepository: TagsRepository, private var mapper
    *
    * */
 
-  fun findAll(): MutableList<Tag> {
-    return this.tagsRepository.findAll()
+  fun findAll(): ResponseEntity<MutableList<Tag>> {
+    val array = this.tagsRepository.findAll()
+    return ResponseEntity.ok().body(array)
   }
 
   /**
@@ -29,8 +31,9 @@ class TagsService(private var tagsRepository: TagsRepository, private var mapper
    * @param id
    * */
 
-  fun findOneById(id: Long): Optional<Tag> {
-    return this.tagsRepository.findById(id)
+  fun findOneById(id: Long): ResponseEntity<Optional<Tag>> {
+    val current = this.tagsRepository.findById(id)
+    return ResponseEntity.ok().body(current)
   }
 
   /**
@@ -40,9 +43,9 @@ class TagsService(private var tagsRepository: TagsRepository, private var mapper
    *
    * */
 
-  fun create(payload: TagPayload): Tag {
+  fun create(payload: TagPayload): ResponseEntity<Tag> {
     val current = Optional.ofNullable(this.mapper.getMapper().map(payload, Tag::class.java)).get()
-    return this.tagsRepository.save(current)
+    return ResponseEntity.status(201).body(this.tagsRepository.save(current))
   }
 
   /**
@@ -58,6 +61,20 @@ class TagsService(private var tagsRepository: TagsRepository, private var mapper
   }
 
   /**
+   * ## changeProperty
+   *
+   * Метод чтобы изменить данные черновика.
+   *
+   * @param id
+   * @param update
+   * */
+
+  private fun changeProperty(id: Long, update: (Tag) -> Unit): ResponseEntity<Tag> {
+    val current = this.tagsRepository.findById(id).get().apply(update)
+    return ResponseEntity.status(200).body(current)
+  }
+
+  /**
    * ## update
    *
    * Изменить категорию.
@@ -66,11 +83,10 @@ class TagsService(private var tagsRepository: TagsRepository, private var mapper
    * @param payload
    * */
 
-  fun update(id: Long, payload: TagPayload): Tag {
-    val current = this.tagsRepository.findById(id).get().apply {
-      this.title = payload.title
-      this.color = payload.color
+  fun update(id: Long, payload: TagPayload): ResponseEntity<Tag> {
+    return this.changeProperty(id) {
+      it.title = payload.title
+      it.color = payload.color
     }
-    return this.tagsRepository.save(current)
   }
 }
