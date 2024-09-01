@@ -1,28 +1,29 @@
 package ru.itcollege.feedservice.routes.tags.controllers
 
-import io.swagger.v3.oas.annotations.tags.Tag
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import ru.itcollege.feedservice.routes.tags.models.dto.TagPayload
+import ru.itcollege.feedservice.routes.tags.models.entities.Tag
 import ru.itcollege.feedservice.routes.tags.services.TagsService
 import java.util.*
 
-@Tag(name = "Категории")
+@io.swagger.v3.oas.annotations.tags.Tag(name = "Категории")
 @RestController
 @RequestMapping("/tags")
 class TagsController(private var tagsService: TagsService) {
 
   @GetMapping
-  fun findAll(): MutableList<ru.itcollege.feedservice.routes.tags.models.entities.Tag> {
+  fun findAll(): ResponseEntity<MutableList<Tag>> {
     return this.tagsService.findAll()
   }
 
   @GetMapping("{id}")
-  fun findOneById(@PathVariable id: String): Optional<ru.itcollege.feedservice.routes.tags.models.entities.Tag> {
+  fun findOneById(@PathVariable id: String): ResponseEntity<Optional<Tag>> {
     return this.tagsService.findOneById(id.toLong())
   }
 
   @PostMapping("/create")
-  fun create(@RequestBody body: TagPayload): ru.itcollege.feedservice.routes.tags.models.entities.Tag {
+  fun create(@RequestBody body: TagPayload): ResponseEntity<Tag> {
     return this.tagsService.create(body)
   }
 
@@ -35,7 +36,7 @@ class TagsController(private var tagsService: TagsService) {
   fun update(
     @PathVariable id: String,
     @RequestBody body: TagPayload
-  ): ru.itcollege.feedservice.routes.tags.models.entities.Tag {
+  ): ResponseEntity<Tag> {
     return this.tagsService.update(id.toLong(), body)
   }
 }

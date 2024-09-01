@@ -1,6 +1,7 @@
 package ru.itcollege.feedservice.routes.drafts.services
 
 import jakarta.servlet.http.HttpServletRequest
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 import ru.itcollege.feedservice.core.api.authorization.AuthorizationGrpcClient
 import ru.itcollege.feedservice.core.config.MapperConfig
@@ -24,11 +25,13 @@ class DraftsService(
    * ## findAllByAuthorId
    *
    * Получить список черновиков по **authorId**
+   *
    * */
 
-  fun findAllByAuthorId(request: HttpServletRequest): MutableList<General> {
+  fun findAllByAuthorId(request: HttpServletRequest): ResponseEntity<MutableList<General>> {
     val authorId: String = this.authorizationGrpcClient.getUserByAccess(request.getHeader("Authorization")).toString()
-    return this.generalRepository.findByStatusAndAuthorId(GStatus.DRAFT, authorId)
+    val current = this.generalRepository.findByStatusAndAuthorId(GStatus.DRAFT, authorId)
+    return ResponseEntity.ok().body(current)
   }
 
   /**
@@ -39,9 +42,10 @@ class DraftsService(
    * @param uuid
    * */
 
-  fun findOneByUUID(uuid: String): General {
-    return this.generalRepository.findByStatusAndUuid(GStatus.DRAFT, UUID.fromString(uuid))
+  fun findOneByUUID(uuid: String): ResponseEntity<General> {
+    val current = this.generalRepository.findByStatusAndUuid(GStatus.DRAFT, UUID.fromString(uuid))
       ?: throw ResourceNotFoundException("Черновик не найден.")
+    return ResponseEntity.ok().body(current)
   }
 
   /**
@@ -53,13 +57,28 @@ class DraftsService(
    * @param payload
    * */
 
-  private fun create(authorId: String, payload: DraftPayload): General {
+  private fun create(authorId: String, payload: DraftPayload): ResponseEntity<General> {
     val current = Optional.ofNullable(this.mapper.getMapper().map(payload, General::class.java)).apply {
       this.get().date = ZonedDateTime.now(ZoneOffset.UTC)
       this.get().status = GStatus.DRAFT
       this.get().authorId = authorId
     }
-    return this.generalRepository.save(current.get())
+    return ResponseEntity.status(201).body(this.generalRepository.save(current.get()))
+  }
+
+  /**
+   * ## changeProperty
+   *
+   * Метод чтобы изменить данные черновика.
+   *
+   * @param uuid
+   * @param update
+   * */
+
+  private fun changeProperty(uuid: String, update: (General?) -> Unit): ResponseEntity<General> {
+    val current = this.generalRepository.findByStatusAndUuid(GStatus.DRAFT, UUID.fromString(uuid)).apply(update)
+      ?: throw ResourceNotFoundException("Черновик не найден.")
+    return ResponseEntity.status(200).body(current)
   }
 
   /**
@@ -71,13 +90,12 @@ class DraftsService(
    * @param payload
    * */
 
-  private fun update(uuid: String, payload: DraftPayload): General {
-    val current = this.generalRepository.findByStatusAndUuid(GStatus.DRAFT, UUID.fromString(uuid)).apply {
-      this?.title = payload.title
-      this?.content = payload.content
-      this?.date = ZonedDateTime.now(ZoneOffset.UTC)
-    } ?: throw ResourceNotFoundException("Черновик не найден.")
-    return this.generalRepository.save(current)
+  private fun update(uuid: String, payload: DraftPayload): ResponseEntity<General> {
+    return this.changeProperty(uuid) {
+      it?.title = payload.title
+      it?.content = payload.content
+      it?.date = ZonedDateTime.now(ZoneOffset.UTC)
+    }
   }
 
   /**
@@ -89,7 +107,7 @@ class DraftsService(
    * @param payload
    * */
 
-  fun save(uuid: String?, payload: DraftPayload, request: HttpServletRequest): General? {
+  fun save(uuid: String?, payload: DraftPayload, request: HttpServletRequest): ResponseEntity<General> {
     val authorId: String = this.authorizationGrpcClient.getUserByAccess(request.getHeader("Authorization")).toString()
     return uuid?.let { this.update(it, payload) } ?: this.create(authorId, payload)
   }
@@ -102,11 +120,10 @@ class DraftsService(
    * @param uuid
    * */
 
-  fun archive(uuid: String): General? {
-    val current = this.generalRepository.findByStatusAndUuid(GStatus.DRAFT, UUID.fromString(uuid)).apply {
-      this?.status = GStatus.ARCHIVE
-    } ?: throw ResourceNotFoundException("Черновик не найден.")
-    return current.let { this.generalRepository.save(it) }
+  fun archive(uuid: String): ResponseEntity<General> {
+    return this.changeProperty(uuid) {
+      it?.status = GStatus.ARCHIVE
+    }
   }
 
 }
